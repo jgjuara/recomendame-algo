@@ -1,5 +1,5 @@
 library(shiny)
-library(dplyr)
+library(tidyverse)
 library(bslib)
 
 ui <- page_navbar(
@@ -18,45 +18,152 @@ ui <- page_navbar(
     ),
   nav_panel(
     title = "Recomendame algo amigue",
-      card(max_height = "20%", min_height = "20%",
-           card_body(textInput("email", "Enter your email", ""),fill = T)
+      column(8,
+             
+      card(max_height = "20%", min_height = "100px",
+           card_body(textInput("email", "Pasame tu mail", ""),fill = T)
         ),
         accordion(
           multiple = T,
-          accordion_panel(value = "1",title = "Book Recommendation 1:",textInput("book1",label = "", value = "")),
-          accordion_panel(value = "2",title = "Book Recommendation 2:",textInput("book2",label = "", value = "")),
-          accordion_panel(value = "3",title = "Book Recommendation 3:",textInput("book3",label = "", value = "")),
-          accordion_panel(value = "4",title = "Book Recommendation 4:",textInput("book4",label = "", value = "")),
-          accordion_panel(value = "5",title = "Book Recommendation 5:",textInput("book5",label = "", value = ""))
+          accordion_panel(value = "1",
+                          title = "1era recomendación",
+                          textInput("libro1",
+                                    label = "Título y autor del libro",
+                                    value = "", width = '100%'),
+                          textAreaInput("explicacion1",
+                                    label = "¿Por qué lo recomendás?",
+                                    value = "", width = '100%')
+                          ),
+          accordion_panel(value = "2",
+                          title = "2da recomendación",
+                          textInput("libro2",
+                                    label = "Título y autor del libro",
+                                    value = "", width = '100%'),
+                          textAreaInput("explicacion2",
+                                    label = "¿Por qué lo recomendás?",
+                                    value = "", width = '100%')
+          ),
+          accordion_panel(value = "3",
+                          title = "3era recomendación",
+                          textInput("libro3",
+                                    label = "Título y autor del libro",
+                                    value = "", width = '100%'),
+                          textAreaInput("explicacion3",
+                                    label = "¿Por qué lo recomendás?",
+                                    value = "", width = '100%')
+          ),
+          accordion_panel(value = "4",
+                          title = "4ta recomendación",
+                          textInput("libro4",
+                                    label = "Título y autor del libro",
+                                    value = ""),
+                          textAreaInput("explicacion4",
+                                    label = "¿Por qué lo recomendás?",
+                                    value = "", width = '100%')
+          ),
+          accordion_panel(value = "5",
+                          title = "5ta recomendación",
+                          textInput("libro5",
+                                    label = "Título y autor del libro",
+                                    value = ""),
+                          textAreaInput("explicacion5",
+                                    label = "¿Por qué lo recomendás?",
+                                    value = "", width = '100%')
+          ),
         ),
-      actionButton("submit", "Submit")
+      actionButton("submit", "Guardar recomendaciones", width = '100%'),
+      offset = 2
+      ),
+    column(2)
     ),
     nav_panel(
-      title = "¿Te recomiendo algo yo?",
-      card("Te recomiendo esto")
+      title = "¿Te comparto unas recomendaciones?",
+      column(8,
+             card(max_height = "20%", min_height = "100px",
+                  card_body(textInput("email", "Decime tu email", ""),fill = T), 
+             ),
+             br(),
+             actionButton("askRecomendation", "Pedir recomendaciones", width = '100%'),
+             card(card_body(uiOutput("recomendaciones"))),
+             offset = 2
+      ),
+      column(2)
     )
   )
 
 server <- function(input, output, session) {
-  user_data <- reactiveValues(data = if(file.exists("user_data.rds")) readRDS("user_data.rds") else data.frame(email = character(), book1 = character(), book2 = character(), book3 = character(), book4 = character(), book5 = character(), stringsAsFactors = FALSE))
-  
+
   observeEvent(input$submit, {
-    new_entry <- data.frame(email = input$email, book1 = input$book1, book2 = input$book2, book3 = input$book3, book4 = input$book4, book5 = input$book5, stringsAsFactors = FALSE)
-    user_data$data <- rbind(user_data$data, new_entry)
+    respuestas <- reactive({
+      x <- reactiveValuesToList(input)
+      x <- x[grep("email|libro|explicacion",names(x))]
+      x <- lapply(x, function(x) {if(is.null(x)) {""} else {x}})
+      x
+      
+    })
+
+    df <- as_tibble(respuestas())
     
-    saveRDS(user_data$data, "user_data.rds")
+    df <- df %>% 
+      mutate(across(everything(), as.character))
+
+    readr::write_csv(df, glue::glue("data/{session$token}-user-data.csv"), quote = "all", eol = "\n")
     
-    output$thankYou <- renderText("Thank you for your recommendations!")
+    showModal(modalDialog(
+      title = NULL, size = "s",
+      div(p("Recomendaciones guardadas.", br(), p("¡Gracias por compartir!")),
+          modalButton("Cerrar")),
+      easyClose = TRUE,
+      footer = NULL
+    ))    
     
-    all_books <- unlist(user_data$data[ ,2:6])
-    all_books <- all_books[all_books != ""]
-    
-    user_books <- unlist(new_entry[ ,2:6])
-    
-    recommended_books <- sample(setdiff(all_books, user_books), 5)
-    
-    output$feedback <- renderText(paste("Here are 5 book recommendations for you: ", paste(recommended_books, collapse = ", ")))
   })
+  
+  observeEvent(input$askRecomendation, {
+
+    
+    archivos <- list.files("data", full.names = T)
+    
+    rptas <- map(archivos, read_csv)
+    
+    rptas <- bind_rows(rptas)
+    
+    # filtrar las respuestas del propio usuario y generar subset
+    
+    rptas <- rptas %>% filter(! email %in% input$email2)
+    
+    rptas <- rptas %>% 
+      pivot_longer(cols = -email) %>% 
+      mutate(id = gsub("[^\\d]", "",name, perl = T),
+             name = gsub("\\d", "", name, perl = T))
+    
+    rptas <- left_join(rptas[rptas$name == "libro",],
+              rptas[rptas$name == "explicacion",], by = c("email", "id")) 
+      
+    rptas <- rptas[!is.na(rptas$value.x),]
+    
+    rptas <- rptas %>% 
+      slice_sample(n = 5, replace = F)
+    
+    items <- map2(rptas$value.x, rptas$value.y,
+                  .f =  function(x,y) {
+                    accordion_panel(title = tags$b(x), y, value = x)
+                  })
+    
+    # gurdar csv con la combinacion de recomendaciones y el mail de a quien se le recomendó eso
+    
+    # generar salida descarble
+    
+    output$recomendaciones <- renderUI({
+      
+      
+      accordion(!!!items)
+    })
+    
+    
+  })
+  
+
 }
 
 shinyApp(ui = ui, server = server)
