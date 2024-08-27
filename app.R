@@ -123,7 +123,7 @@ server <- function(input, output, session) {
     df <- df %>% 
       mutate(across(everything(), as.character))
 
-    readr::write_csv(df, glue::glue("data/{session$token}-user-data-strftime(Sys.time(), '-%Y%m%d-%H%M%S%z')}.csv"),
+    readr::write_csv(df, glue::glue("data/{session$token}-user-data-{strftime(Sys.time(), '-%Y%m%d-%H%M%S%z')}.csv"),
                      quote = "all", eol = "\n")
     
     showModal(modalDialog(
