@@ -80,7 +80,7 @@ ui <- page_navbar(
       title = "¿Te comparto unas recomendaciones?",
       column(8,
              card(max_height = "20%", min_height = "100px",
-                  card_body(textInput("email", "Decime tu email", ""),fill = T), 
+                  card_body(textInput("email2", "Decime tu email", ""),fill = T), 
              ),
              br(),
              actionButton("askRecomendation", "Pedir recomendaciones", width = '100%'),
@@ -107,7 +107,8 @@ server <- function(input, output, session) {
     df <- df %>% 
       mutate(across(everything(), as.character))
 
-    readr::write_csv(df, glue::glue("data/{session$token}-user-data.csv"), quote = "all", eol = "\n")
+    readr::write_csv(df, glue::glue("data/{session$token}-user-data-{Sys.time()}.csv"),
+                     quote = "all", eol = "\n")
     
     showModal(modalDialog(
       title = NULL, size = "s",
