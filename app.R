@@ -19,59 +19,65 @@ ui <- page_navbar(
   nav_panel(
     title = "Recomendame algo amigue",
       column(8,
-             
-      card(max_height = "20%", min_height = "100px",
-           card_body(textInput("email", "Pasame tu mail", ""),fill = T)
-        ),
-        accordion(
-          multiple = T,
-          accordion_panel(value = "1",
-                          title = "1era recomendación",
-                          textInput("libro1",
-                                    label = "Título y autor del libro",
-                                    value = "", width = '100%'),
-                          textAreaInput("explicacion1",
-                                    label = "¿Por qué lo recomendás?",
-                                    value = "", width = '100%')
-                          ),
-          accordion_panel(value = "2",
-                          title = "2da recomendación",
-                          textInput("libro2",
-                                    label = "Título y autor del libro",
-                                    value = "", width = '100%'),
-                          textAreaInput("explicacion2",
-                                    label = "¿Por qué lo recomendás?",
-                                    value = "", width = '100%')
-          ),
-          accordion_panel(value = "3",
-                          title = "3era recomendación",
-                          textInput("libro3",
-                                    label = "Título y autor del libro",
-                                    value = "", width = '100%'),
-                          textAreaInput("explicacion3",
-                                    label = "¿Por qué lo recomendás?",
-                                    value = "", width = '100%')
-          ),
-          accordion_panel(value = "4",
-                          title = "4ta recomendación",
-                          textInput("libro4",
-                                    label = "Título y autor del libro",
-                                    value = ""),
-                          textAreaInput("explicacion4",
-                                    label = "¿Por qué lo recomendás?",
-                                    value = "", width = '100%')
-          ),
-          accordion_panel(value = "5",
-                          title = "5ta recomendación",
-                          textInput("libro5",
-                                    label = "Título y autor del libro",
-                                    value = ""),
-                          textAreaInput("explicacion5",
-                                    label = "¿Por qué lo recomendás?",
-                                    value = "", width = '100%')
-          ),
-        ),
-      actionButton("submit", "Guardar recomendaciones", width = '100%'),
+             accordion(
+               multiple = T,
+               accordion_panel(value = "1",
+                               title = "Prólogo",
+                               p(""),
+                               p("Sólo te pido el mail para evitar recomendarte algo que vos mismx pusiste")
+               )),
+            card(max_height = "20%", min_height = "100px",
+                 card_body(textInput("email", "Pasame tu mail", ""),fill = T)
+              ),
+            accordion(
+              multiple = T,
+              accordion_panel(value = "1",
+                              title = "1era recomendación",
+                              textInput("libro1",
+                                        label = "Título y autor del cuento",
+                                        value = "", width = '100%'),
+                              textAreaInput("explicacion1",
+                                        label = "¿Por qué lo recomendás?",
+                                        value = "", width = '100%')
+                              ),
+              accordion_panel(value = "2",
+                              title = "2da recomendación",
+                              textInput("libro2",
+                                        label = "Título y autor del cuento",
+                                        value = "", width = '100%'),
+                              textAreaInput("explicacion2",
+                                        label = "¿Por qué lo recomendás?",
+                                        value = "", width = '100%')
+              ),
+              accordion_panel(value = "3",
+                              title = "3era recomendación",
+                              textInput("libro3",
+                                        label = "Título y autor del cuento",
+                                        value = "", width = '100%'),
+                              textAreaInput("explicacion3",
+                                        label = "¿Por qué lo recomendás?",
+                                        value = "", width = '100%')
+              ),
+              accordion_panel(value = "4",
+                              title = "4ta recomendación",
+                              textInput("libro4",
+                                        label = "Título y autor del cuento",
+                                        value = "", width = '100%'),
+                              textAreaInput("explicacion4",
+                                        label = "¿Por qué lo recomendás?",
+                                        value = "", width = '100%')
+              ),
+              accordion_panel(value = "5",
+                              title = "5ta recomendación",
+                              textInput("libro5",
+                                        label = "Título y autor del cuento",
+                                        value = "", width = '100%'),
+                              textAreaInput("explicacion5",
+                                        label = "¿Por qué lo recomendás?",
+                                        value = "", width = '100%')
+              ),
+            ),
+           actionButton("submit", "Guardar recomendaciones", width = '100%'),
       offset = 2
       ),
     column(2)
@@ -107,7 +113,7 @@ server <- function(input, output, session) {
     df <- df %>% 
       mutate(across(everything(), as.character))
 
-    readr::write_csv(df, glue::glue("data/{session$token}-user-data-{Sys.time()}.csv"),
+    readr::write_csv(df, glue::glue("data/{session$token}-user-data-strftime(Sys.time(), '-%Y%m%d-%H%M%S%z')}.csv"),
                      quote = "all", eol = "\n")
     
     showModal(modalDialog(
