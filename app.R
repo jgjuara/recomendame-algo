@@ -23,8 +23,8 @@ ui <- page_navbar(
                multiple = T,
                accordion_panel(value = "1",
                                title = "Prólogo",
-                               p(""),
-                               p("Sólo te pido el mail para evitar recomendarte algo que vos mismx pusiste")
+                               p("Estimado o estimado cluber, inserte aquí sus elecciones de cuentos favoritos (tiene hasta cinco opciones, puede usar las cinco o menos), y recibirá a cambio una serie de cuentos elegidos por otros clubbers. Intercambiar un don y un contradon imaginarios es una linda manera de hacer la amistad."),
+                               p("(Sólo te pido el mail para evitar recomendarte algo que vos mismx pusiste)")
                )),
             card(max_height = "20%", min_height = "100px",
                  card_body(textInput("email", "Pasame tu mail", ""),fill = T)
@@ -102,6 +102,12 @@ ui <- page_navbar(
   )
 
 server <- function(input, output, session) {
+  
+  showModal(modalDialog(
+    title = "",
+    "Hola! Esto es el recomendador invisible, un idea en forma de app para que el Club de Lectura de Fundar siga haciendo comunidad, a favor del gusto y de la polémica, en contra del prejuicio.",
+    easyClose = TRUE
+  ))
 
   observeEvent(input$submit, {
     respuestas <- reactive({
