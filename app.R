@@ -23,7 +23,7 @@ ui <- page_navbar(
                multiple = T,
                accordion_panel(value = "1",
                                title = "Prólogo",
-                               p("Estimado o estimado cluber, inserte aquí sus elecciones de cuentos favoritos (tiene hasta cinco opciones, puede usar las cinco o menos), y recibirá a cambio una serie de cuentos elegidos por otros clubbers. Intercambiar un don y un contradon imaginarios es una linda manera de hacer la amistad."),
+                               p("Estimada o estimado cluber, inserte aquí sus elecciones de cuentos favoritos (tiene hasta cinco opciones, puede usar las cinco o menos), y recibirá a cambio una serie de cuentos elegidos por otros clubbers. Intercambiar un don y un contradon imaginarios es una linda manera de hacer la amistad."),
                                p("(Sólo te pido el mail para evitar recomendarte algo que vos mismx pusiste)")
                )),
             card(max_height = "20%", min_height = "100px",
