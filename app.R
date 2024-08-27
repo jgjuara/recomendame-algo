@@ -81,24 +81,24 @@ ui <- page_navbar(
       offset = 2
       ),
     column(2)
-    ),
-    nav_panel(
-      title = "¿Te comparto unas recomendaciones?",
-      column(8,
-             card( min_height = "100px",
-               card_body(p("Ingresá el mismo mail que usaste para guardar tus recomendaciones, así me fijo de no recomendarte algo que hayas puesto vos."))
-             ),
-             card(max_height = "20%", min_height = "100px",
-                  card_body(
-                    textInput("email2", "Decime tu email", ""),fill = T), 
-             ),
-             br(),
-             actionButton("askRecomendation", "Pedir recomendaciones", width = '100%'),
-             card(card_body(uiOutput("recomendaciones"))),
-             offset = 2
-      ),
-      column(2)
-    )
+    )#,
+    # nav_panel(
+    #   title = "¿Te comparto unas recomendaciones?",
+    #   column(8,
+    #          card( min_height = "100px",
+    #            card_body(p("Ingresá el mismo mail que usaste para guardar tus recomendaciones, así me fijo de no recomendarte algo que hayas puesto vos."))
+    #          ),
+    #          card(max_height = "20%", min_height = "100px",
+    #               card_body(
+    #                 textInput("email2", "Decime tu email", ""),fill = T), 
+    #          ),
+    #          br(),
+    #          actionButton("askRecomendation", "Pedir recomendaciones", width = '100%'),
+    #          card(card_body(uiOutput("recomendaciones"))),
+    #          offset = 2
+    #   ),
+    #   column(2)
+    # )
   )
 
 server <- function(input, output, session) {
