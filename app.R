@@ -19,6 +19,7 @@ ui <- page_navbar(
   nav_panel(
     title = "Recomendame algo amigue",
       column(8,
+             uiOutput("progressBarTest"),
              accordion(
                multiple = T,
                accordion_panel(value = "1",
@@ -179,6 +180,58 @@ server <- function(input, output, session) {
     
     
   })
+  
+  progreso <- reactive({
+    
+    archivos <- list.files("data", full.names = T)
+    
+    rptas <- map(archivos, read_csv)
+    
+    rptas <- bind_rows(rptas)
+    
+    x <- 100*nrow(rptas)/20
+    
+    if (x > 100) {
+      100
+    } else {
+      x
+    }
+    100
+  })
+  
+  
+  output$progressBarTest <- renderUI({
+    
+    barra <-     tags$div(
+      class = "progress",
+      tags$div(
+        class = "progress-bar bg-green bg-gradient",
+        role = "progressbar",
+        style = sprintf("width: %i%%", round(progreso(),0)),
+        `aria-valuenow` = as.character(round(progreso(),0)),
+        `aria-valuemin` = "0",
+        `aria-valuemax` = "100"
+      )
+    )
+    
+    if (progreso() < 100 ) {
+      
+      card(card_body(p("Necesitamos ayuda con más recomendaciones para arrancar!",
+                       barra
+                       )))
+      
+    } else {
+      
+      card(card_body(p("Ya estamos listos arrancar el recomendador invisible! (pero igual agradecemos toda nueva recomendación)",
+                       barra
+      )))
+      
+    }
+    
+    
+
+    
+  })  
   
 
 }
